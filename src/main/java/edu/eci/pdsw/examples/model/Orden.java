@@ -5,23 +5,23 @@ import java.util.List;
 
 public class Orden {
 
-	List<Plato> platos;
+	List<ItemOrden> itemsOrden;
 
 	public Orden() {
-		platos=new LinkedList<>();
+		itemsOrden=new LinkedList<>();
 	}
 	
-	public void agregarPlato(Plato p){
-		platos.add(p);
+	public void agregarItemOrden(ItemOrden p){
+		itemsOrden.add(p);
 	}
 	
-	public List<Plato> getPlatos(){
-		return platos;
+	public List<ItemOrden> getItemsOrden(){
+		return itemsOrden;
 	}
 	
         @Override
 	public String toString(){
-		return platos.toString();
+		return itemsOrden.toString();
 	}
 	
 }

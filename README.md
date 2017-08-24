@@ -1,141 +1,75 @@
 ### Escuela Colombiana de Ingeniería
 
-### Arquitecturas de Software
+### Procesos de Desarrollo de Software
 
+### Desarrollo Dirigido por Pruebas + DIP + DI + Contenedores Livianos
 
-#### API REST adaptable para el cálculo de cuentas de restaurantes.
+Se le ha pedido desarrollar un API para el cálculo de las cuentas de restaurantes de acuerdo con la normatividad Colombiana, el cual pueda ser integrado a aplicaciones POS (Point of Sale). La particularidad de este API es se espera que pueda ser aplicado en diferentes tipo de restaurantes, ya que éstos -muchas veces- interpretan y aplican las normas de manera diferente. En particular, se tienen -por ahora- los siguientes casos:
 
-En este proyecto se va a construír un API REST que permita calcular el valor total de una cuenta de restaurante, teniendo en cuenta las políticas y regímenes tributarios configurados para la misma.
+* En algunos restaurantes los precios de los platos ya incluirán el IVA (CalculadorBasicoCuentas) y no cobran propina. Es decir, la cuenta es simplemente la sumatoria de los precios.
 
-Este API será soportado por el siguiente modelo de clases, el cual considera el principio de inversión de dependencias, y asume el uso de Inyección de dependencias:
+* En otros restaurantes los precios ya incluyen el IVA, pero sí cobran el servicio del 10% sobre el total de la factura, siempre que el valor total de la misma supere los $15.000 pesos.(CalculadorCuentaConPropina).
+
+* En muchos otros sí se cobra el IVA. Sin embargo, la manera de hacerlo varía de dos formas:
+	* 19% estándar sobre todos los platos (CalcularodCuentaConIVA + VerificadorIVAEstandar).
+	* Aplicando un IVA diferencial a cada tipo de plato, previendo el régimen especial de impuestos a las comidas del el año 2016, donde:
+		* Las bebidas azucaradas (con más de 1000 calorías) tendrán un gravamen adicional del 10% (es decir, un gravamen del 29%).
+		* Los demás platos tendrán el gravamen estándar del 19%.
+
+Lo anterior, se traduce en el siguiente modelo, donde se aplica el principio de inversión de dependencias:
+
 
 ![](img/BeansModel.png)
 
 
-El anterior modelo considera, por ahora, los siguientes casos (la aplicación podrá configurarse de acuerdo con el restaurante donde sea usado):
-
-* En algunos restaurantes los precios de los platos ya incluyen el IVA (CalculadorBasicoCuentas).
-* En otros restaurantes los precios ya incluyen el IVA, pero sí cobran el servicio del 10% sobre el total de la factura (CalculadorCuentaConPropina).
-* En muchos otros se cobra el IVA, pero de dos maneras diferentes:
-	* 16% estándar sobre todos los platos (CalcularodCuentaConIVA + VerificadorIVAEstandar).
-	* Aplicando un IVA diferencial al tipo de plato, previendo el régimen especial de impuestos a las comidas del el año 2013, donde las bebidas gaseosas tendrán un gravamen de sólo el 10%, y los demás platos del 17% (CalcularodCuentaConIVA + VerificadorIVARegimen2013).
-
-
-Por defecto, el manejador de órdenes tiene dos órdenes registradas:
-
-* Orden 0:
-
-	| Producto        | Precio           | 
-| ------------- |:-------------:| 
-|pizza|$7500|
-|gaseosa|$3900|
-|hamburguesa|$8000|
-|gaseosa 350|$200|
-
-* Orden 1:
-
-	| Producto        | Precio           | 
-| ------------- |:-------------:| 		
-|pizza|$7500|
-|pizza|$7500|
-|pizza|$7500|
-|gaseosa litro|$4000|
-
-
 ### Parte I
 
-1. Configure su aplicación para que ofrezca el recurso "/ordenes", de manera que cuando se le haga una petición GET, retorne -en formato jSON- el listado de todas las órdenes. Para esto:
-	* Modifique la clase CuentaResourceController teniendo en cuenta el siguiente ejemplo de controlador REST hecho con SpringMVC/SpringBoot:
+1. Clone el proyecto (no lo descargue!).
+2. A partir del código existente, implemente sólo los cascarones del modelo antes indicado.
 
-	```java
-@RestController
-@RequestMapping(value = "/url-raiz-recurso")
-public class XXController {
-    
-        
-    @RequestMapping(method = RequestMethod.GET)
-    public ResponseEntity<?> manejadorGetRecursoXX(){
-        try {
-            //obtener datos que se enviarán a través del API
-            return new ResponseEntity<>(data,HttpStatus.ACCEPTED);
-        } catch (XXException ex) {
-            Logger.getLogger(XXController.class.getName()).log(Level.SEVERE, null, ex);
-            return new ResponseEntity<>("Error bla bla bla",HttpStatus.NOT_FOUND);
-        }        
-}
+3. Haga la especificación de los métodos calcularCosto (de las tres variantes de CalculadorCuenta), a partir de las especificaciones generales dadas anteriormente. Recuerde tener en cuenta: @pre, @pos, @param, @throws.
 
+4. Haga commit de lo realizado hasta ahora. Desde la terminal:
+
+	```bash		
+	git add .			
+	git commit -m "especificación métodos"
 	```
-	* Haga que en esta misma clase se inyecte el bean de tipo ManejadorOrdenes, y que a éste -a su vez-, se le inyecte el bean CalculadorBasicoCuentas. Para esto, revise en [la documentación de Spring](http://docs.spring.io/spring/docs/current/spring-framework-reference/html/beans.html) las secciones 7.9.2 y 7.10.3, respecto a cómo declarar Beans, y cómo definir la inyección de dependencias entre éstos, mediante anotaciones.
 
-2. Verifique el funcionamiento de a aplicación lanzando la aplicación con maven:
+5. Teniendo en cuenta dichas especificaciones, en la clase donde se implementarán las pruebas (CalculadorCuentasTest), en los comentarios iniciales, especifique las clases de equivalencia para las tres variantes de calculador de cuenta, e identifique condiciones de frontera. Tenga presente que además de los parámetros de entrada, el resultado de dichas calculadoras (la que tiene en cuenta el IVA) dependerá de qué objetos de bajo nivel tendrá asociados.
 
-	```bash
-	$ mvn spring-boot:run
-	
+6. Para cada clase de equivalencia y condición de frontera, implemente una prueba.
+
+7. Haga commit de lo realizado hasta ahora. Desde la terminal:
+
+	```bash		
+	git add .			
+	git commit -m "implementación pruebas"
 	```
-	Y luego enviando una petición GET a: http://localhost:8080/ordenes. Rectifique que, como respuesta, se obtenga un objeto jSON con una lista que contenga las dos órdenes disponibles por defecto.
+8. Realice los ciclos TDD que hagan falta para implementar los 'cascarones' realizados anteriormente: implementar, correr pruebas, agregar casos de prueba (si hace falta), refactorizar, ejecutar nuevamente las pruebas, etc.
+
+9. Al finalizar haga un nuevo commit:
+
+	```bash		
+	git add .			
+	git commit -m "implementación del modelo"
+	```
+
+10. Para comprimir el avance y NO PERDER el histórico de commits, use el siguiente comando (dentro del directorio que va a comprimir, sin olvidar el punto):
+
+```bash	
+	zip -r NOMBRE.PROYECTO.zip .	
+```
 
 
-3. Modifique el controlador para que ahora, adicionalmente, acepte peticiones GET al recurso /orden/{idorden}, donde {idorden} es el número de una orden en particular. En este caso, la respuesta debe ser la orden indicada en formato jSON. Para esto, revise en [la documentación de Spring](http://docs.spring.io/spring/docs/current/spring-framework-reference/html/mvc.html), sección 22.3.2, el uso de @PathVariable. De nuevo, verifique que al hacer una petición GET -por ejemplo- a recurso http://localhost:8080/ordenes/0, se obtenga en formato jSON el detalle correspondiente.
+### Parte II
 
+Incorpore el Contenedor Liviano Guice dentro del proyecto:
 
-###Parte II
-
-1.  Agregue el manejo de peticiones POST (creación de nuevas ordenes), de manera que un cliente http pueda registrar una nueva orden haciendo una petición POST al recurso ‘ordenes’, y enviando como contenido de la petición todo el detalle de dicho recurso a través de un documento jSON. Para esto, tenga en cuenta el siguiente ejemplo, que considera -por consistencia con el protocolo HTTP- el manejo de códigos de estados HTTP (en caso de éxito o error):
-
-	```	
-@RequestMapping(method = RequestMethod.POST)	
-	public ResponseEntity<?> manejadorPostRecursoXX(@RequestBody TipoXX o){
-        try {
-            //registrar dato
-            return new ResponseEntity<>(HttpStatus.CREATED);
-        } catch (XXException ex) {
-            Logger.getLogger(XXController.class.getName()).log(Level.SEVERE, null, ex);
-            return new ResponseEntity<>("Error bla bla bla",HttpStatus.FORBIDDEN);            
-        }        
- 	
-	}
-	```	
-
-
-2.  Para probar que el recurso ‘ordenes’ acepta e interpreta
-    correctamente las peticiones POST, use el comando curl de Unix. Este
-    comando tiene como parámetro el tipo de contenido manejado (en este
-    caso jSON), y el ‘cuerpo del mensaje’ que irá con la petición, lo
-    cual en este caso debe ser un documento jSON equivalente a la clase
-    Cliente (donde en lugar de {ObjetoJSON}, se usará un objeto jSON correspondiente a una nueva orden:
-
-	```	
-	$ curl -i -X POST -HContent-Type:application/json -HAccept:application/json http://URL_del_recurso_ordenes -d '{ObjetoJSON}'
-	```	
-
-	Con lo anterior, registre una nueva orden (para 'diseñar' un objeto jSON, puede usar [esta herramienta](http://www.jsoneditoronline.org/)):
-
-
-	| Producto        | Precio           | 
-	| ------------- |:-------------:| 
-	|hamburguesa|$8000|
-	|hamburguesa|$8000|		
-	|postre de natas|$5000|
-	|gaseosa light 350|$1000|
-
-
-
-3. Verifique qué identificador fue asignado al recurso anteriormente creado, y que el mismo se pueda obtener mediante una petición GET al recurso '/ordenes/{idorden}' correspondiente.
-
-
-###Parte III
-
-4. Haga lo necesario para que ahora el API acepte peticiones al recurso '/ordenes/{idorden}/total, las cuales retornen el total de la cuenta de la orden {idorden}.
-
-5. Una vez hecho esto, rectifique que el esquema de inyección de dependencias funcione correctamente. Cambie la configuración para que ahora se use el CalculadorCuenta con IVA, con el VerificadorIVARegimen2013. Compruebe que para las ordenes 0 y 1 se calcule el total de forma diferente.
-
-###Parte IV
-
-1. Se requiere que el API permita agregar un producto a una orden. Revise [acá](http://restcookbook.com/HTTP%20Methods/put-vs-post/) cómo se debe manejar el verbo PUT con este fin, y haga la implementación en el proyecto.
-
-2. Teniendo en cuenta que el API podrá ser utilizado simultáneamente por muchos clientes, y que toda la aplicación funciona con una instancia compartida de 'ManejadorOrdenes', revise e indique:
-
-	* Dentro de ManejadorOrdenes, existen elementos que podrían fallar con un manejo concurrente?
-	* Podrían presentarse condiciones de carrera?, cual sería la región crítica?, a qué verbos REST estaría asociada dicha región?. Solucione, si los hay, los problemas asociados a los elementos antes descritos. Responda a las preguntas antes planteadas en el archivo RACE\_COND\_ANALYSIS.txt.
-	
+* Agregue las dependencias necesarias en el pom.xml.
+* Configure la aplicación de manera que desde el programa SimpleApp NO SE CONSTRUYA el manejador de órdenes directamente, sino a través de Guice, y que a través de la configuración de la Inyección de Dependencias se pueda cambiar el comportamiento del mismo, por ejemplo:
+	* Calcular si IVA y sin propinas.
+	* Calcular con el IVA del régimen del 2016.
+	* Calcualr con el IVA unificado.
+	* etc...
+* Para lo anterior, [puede basarse en el ejemplo dado como referencia](https://github.com/PDSW-ECI/LightweighContainers_DepenendecyInjectionIntro-WordProcessor).
