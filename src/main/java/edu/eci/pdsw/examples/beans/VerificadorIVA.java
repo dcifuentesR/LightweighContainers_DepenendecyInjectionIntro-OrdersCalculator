@@ -1,6 +1,6 @@
 package edu.eci.pdsw.examples.beans;
 
-import edu.eci.pdsw.examples.model.Plato;
+import edu.eci.pdsw.examples.model.ItemOrden;
 
 public interface VerificadorIVA {
 	/**
@@ -8,6 +8,6 @@ public interface VerificadorIVA {
 	 * @param p
 	 * @return
 	 */
-	public float obtenerPorcentaje(Plato p);
+	public float obtenerPorcentaje(ItemOrden p);
 
 }
