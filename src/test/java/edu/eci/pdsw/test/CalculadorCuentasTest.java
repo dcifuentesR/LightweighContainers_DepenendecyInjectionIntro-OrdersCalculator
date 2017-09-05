@@ -138,11 +138,11 @@ public class CalculadorCuentasTest {
     				,c1.calcularCosto(o),1);
 
     	o.agregarItemOrden(new Plato("b",14999));
-    	assertEquals("No se calcula el costo adecuadamente con CF4",c1.calcularCosto(o),15000);
-    	assertEquals("No se calcula el costo adecuadamente con CF3",c2.calcularCosto(o),15000);
+    	assertEquals("No se calcula el costo adecuadamente con CF4",15000,c1.calcularCosto(o));
+    	assertEquals("No se calcula el costo adecuadamente con CF3",15000,c2.calcularCosto(o));
     	
     	o.agregarItemOrden(new Plato("a",1));
-    	assertEquals("No se calcula el costo adecuadamente con CF5",c1.calcularCosto(o),15001);
+    	assertEquals("No se calcula el costo adecuadamente con CF5",15001,c1.calcularCosto(o));
     	
     }
     
@@ -156,7 +156,7 @@ public class CalculadorCuentasTest {
     	Orden o = new Orden();
     	
     	o.agregarItemOrden(new Plato("a",15001));
-    	assertEquals("No se calcula el costo adecuadamente con CF6",c.calcularCosto(o),15001*1.1,0.01);
+    	assertEquals("No se calcula el costo adecuadamente con CF6",(int)(15001*1.1),c.calcularCosto(o));
     }
     
     /**
@@ -176,14 +176,14 @@ public class CalculadorCuentasTest {
     	oBebidasAzucaradas.agregarItemOrden(new Bebida("b",25,1001));
     	oBebidasAzucaradas.agregarItemOrden(new Bebida("c", 25, 999));
     	
-    	assertEquals("No se calcula el costo adecuadamente con CF7",cEstandar.calcularCosto(oBebidasAzucaradas),119);
+    	assertEquals("No se calcula el costo adecuadamente con CF7",119,cEstandar.calcularCosto(oBebidasAzucaradas));
     	
     	Orden oNoBebidas=new Orden();
     	
     	oNoBebidas.agregarItemOrden(new Plato("a",50));
     	oNoBebidas.agregarItemOrden(new Plato("b",50));
     	
-    	assertEquals("No se calcula el costo adecuadamente con CF8",cEstandar.calcularCosto(oNoBebidas),119);
+    	assertEquals("No se calcula el costo adecuadamente con CF8",119,cEstandar.calcularCosto(oNoBebidas));
     	
     	Orden oBebidasNoAzucaradas= new Orden();
     	
@@ -192,7 +192,7 @@ public class CalculadorCuentasTest {
     	oBebidasNoAzucaradas.agregarItemOrden(new Bebida("c", 15, 999));
     	oBebidasNoAzucaradas.agregarItemOrden(new Bebida("d", 20, 800));
     	
-    	assertEquals("No se calcula el costo adecuadamente con CF9",c2016.calcularCosto(oBebidasNoAzucaradas),119);
+    	assertEquals("No se calcula el costo adecuadamente con CF9",119,c2016.calcularCosto(oBebidasNoAzucaradas));
     }
     
     
@@ -210,9 +210,9 @@ public class CalculadorCuentasTest {
     	oUnaBebida.agregarItemOrden(new Bebida("b",25,1001));
     	oUnaBebida.agregarItemOrden(new Bebida("c", 25, 999));
     	
-    	assertEquals("No se calcula el costo adecuadamente con CF11",c2016.calcularCosto(oUnaBebida),100*1.19+25*0.10,0.01);
+    	assertEquals("No se calcula el costo adecuadamente con CF11",(int)(100*1.19+25*0.10),c2016.calcularCosto(oUnaBebida));
     	oUnaBebida.agregarItemOrden(new Bebida("d",25,1100));
-    	assertEquals("No se calcula el costo adecuadamente con CF10",c2016.calcularCosto(oUnaBebida),125*1.19+50*0.10,0.01);
+    	assertEquals("No se calcula el costo adecuadamente con CF10",(int)(125*1.19+50*0.10),c2016.calcularCosto(oUnaBebida));
     	
     	Orden oSoloBebidas=new Orden();
     	
@@ -220,6 +220,6 @@ public class CalculadorCuentasTest {
     	oSoloBebidas.agregarItemOrden(new Bebida("b",25,1001));
     	oSoloBebidas.agregarItemOrden(new Bebida("c", 25, 1235));
     	
-    	assertEquals("No se calcula el costo adecuadamente con CF12",c2016.calcularCosto(oSoloBebidas),100*1.19+50*0.10,0.01);
+    	assertEquals("No se calcula el costo adecuadamente con CF12",(int)(100*1.19+50*0.10),c2016.calcularCosto(oSoloBebidas));
     }
 }
