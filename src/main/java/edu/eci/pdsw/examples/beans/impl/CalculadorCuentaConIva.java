@@ -1,5 +1,7 @@
 package edu.eci.pdsw.examples.beans.impl;
 
+import com.google.inject.Inject;
+
 import edu.eci.pdsw.examples.beans.CalculadorCuenta;
 import edu.eci.pdsw.examples.beans.VerificadorIVA;
 import edu.eci.pdsw.examples.model.ItemOrden;
@@ -7,12 +9,9 @@ import edu.eci.pdsw.examples.model.Orden;
 
 public class CalculadorCuentaConIva implements CalculadorCuenta {
 	
+	@Inject
 	private VerificadorIVA ver;
 	
-	public CalculadorCuentaConIva()
-	{
-		ver=new VerificadorIVARegimen2013();
-	}
 	/**
 	 * Calcula el costo total de la orden.
 	 * Se cobra el iva dependiendo de la forma que el restaurante decida

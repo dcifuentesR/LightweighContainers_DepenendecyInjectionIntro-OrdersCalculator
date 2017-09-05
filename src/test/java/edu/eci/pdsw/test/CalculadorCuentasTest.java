@@ -13,8 +13,11 @@ import edu.eci.pdsw.examples.beans.impl.CalculadorBasicoCuentas;
 import edu.eci.pdsw.examples.beans.impl.CalculadorCuentaConIva;
 import edu.eci.pdsw.examples.beans.impl.CalculadorCuentaConPropina;
 import edu.eci.pdsw.examples.model.Bebida;
+import edu.eci.pdsw.examples.model.ExcepcionManejadorOrdenes;
 import edu.eci.pdsw.examples.model.Orden;
 import edu.eci.pdsw.examples.model.Plato;
+import edu.eci.pdsw.examples.services.ManejadorOrdenes;
+import edu.eci.pdsw.examples.services.ManejadorOrdenesFactory;
 
 import static org.junit.Assert.*;
 
@@ -165,25 +168,37 @@ public class CalculadorCuentasTest {
     @Test
     public void testClaseEquivalenciaCE4()
     {
-
-    	CalculadorCuenta cEstandar= new CalculadorCuentaConIva();
     	
-    	CalculadorCuenta c2016=new CalculadorCuentaConIva();
+    	ManejadorOrdenes mo=ManejadorOrdenesFactory.getInstance().getManejadorOrdenes();
+    	
+    	
+    	//CalculadorCuenta c2016=new CalculadorCuentaConIva();
     	
     	Orden oBebidasAzucaradas=new Orden();
     	
     	oBebidasAzucaradas.agregarItemOrden(new Plato("a",50));
     	oBebidasAzucaradas.agregarItemOrden(new Bebida("b",25,1001));
     	oBebidasAzucaradas.agregarItemOrden(new Bebida("c", 25, 999));
-    	
-    	assertEquals("No se calcula el costo adecuadamente con CF7",119,cEstandar.calcularCosto(oBebidasAzucaradas));
+    	mo.registrarOrden(oBebidasAzucaradas);
+    	try {
+			assertEquals("No se calcula el costo adecuadamente con CF7",119,mo.calcularTotalOrden(0));
+		} catch (ExcepcionManejadorOrdenes e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
     	
     	Orden oNoBebidas=new Orden();
     	
     	oNoBebidas.agregarItemOrden(new Plato("a",50));
     	oNoBebidas.agregarItemOrden(new Plato("b",50));
+    	mo.registrarOrden(oNoBebidas);
     	
-    	assertEquals("No se calcula el costo adecuadamente con CF8",119,cEstandar.calcularCosto(oNoBebidas));
+    	try {
+			assertEquals("No se calcula el costo adecuadamente con CF8",119,mo.calcularTotalOrden(1));
+		} catch (ExcepcionManejadorOrdenes e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     	
     	Orden oBebidasNoAzucaradas= new Orden();
     	
@@ -191,8 +206,14 @@ public class CalculadorCuentasTest {
     	oBebidasNoAzucaradas.agregarItemOrden(new Bebida("b",15,1));
     	oBebidasNoAzucaradas.agregarItemOrden(new Bebida("c", 15, 999));
     	oBebidasNoAzucaradas.agregarItemOrden(new Bebida("d", 20, 800));
+    	mo.registrarOrden(oBebidasNoAzucaradas);
     	
-    	assertEquals("No se calcula el costo adecuadamente con CF9",119,c2016.calcularCosto(oBebidasNoAzucaradas));
+    	try {
+			assertEquals("No se calcula el costo adecuadamente con CF9",119,mo.calcularTotalOrden(2));//este es con el regimen 2016
+		} catch (ExcepcionManejadorOrdenes e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
     
     
@@ -202,6 +223,7 @@ public class CalculadorCuentasTest {
     @Test
     public void testClaseEquivalenciaCE5()
     {
+    	ManejadorOrdenes mo=ManejadorOrdenesFactory.getInstance().getManejadorOrdenes();
     	CalculadorCuenta c2016=new CalculadorCuentaConIva();
     	
     	Orden oUnaBebida=new Orden();
@@ -209,10 +231,23 @@ public class CalculadorCuentasTest {
     	oUnaBebida.agregarItemOrden(new Plato("a",50));
     	oUnaBebida.agregarItemOrden(new Bebida("b",25,1001));
     	oUnaBebida.agregarItemOrden(new Bebida("c", 25, 999));
+    	mo.registrarOrden(oUnaBebida);
     	
-    	assertEquals("No se calcula el costo adecuadamente con CF11",(int)(100*1.19+25*0.10),c2016.calcularCosto(oUnaBebida));
+    	try {
+			assertEquals("No se calcula el costo adecuadamente con CF11",(int)(100*1.19+25*0.10),mo.calcularTotalOrden(0));
+		} catch (ExcepcionManejadorOrdenes e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     	oUnaBebida.agregarItemOrden(new Bebida("d",25,1100));
-    	assertEquals("No se calcula el costo adecuadamente con CF10",(int)(125*1.19+50*0.10),c2016.calcularCosto(oUnaBebida));
+    	
+    	mo.registrarOrden(oUnaBebida);
+    	try {
+			assertEquals("No se calcula el costo adecuadamente con CF10",(int)(125*1.19+50*0.10),mo.calcularTotalOrden(1));
+		} catch (ExcepcionManejadorOrdenes e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
     	
     	Orden oSoloBebidas=new Orden();
     	
@@ -220,6 +255,12 @@ public class CalculadorCuentasTest {
     	oSoloBebidas.agregarItemOrden(new Bebida("b",25,1001));
     	oSoloBebidas.agregarItemOrden(new Bebida("c", 25, 1235));
     	
-    	assertEquals("No se calcula el costo adecuadamente con CF12",(int)(100*1.19+50*0.10),c2016.calcularCosto(oSoloBebidas));
+    	mo.registrarOrden(oSoloBebidas);
+    	try {
+			assertEquals("No se calcula el costo adecuadamente con CF12",(int)(100*1.19+50*0.10),mo.calcularTotalOrden(2));
+		} catch (ExcepcionManejadorOrdenes e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
 }
